@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IH — MX Direction 2026 Prototype</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #e8e8e8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .phone-frame {
+      width: 393px;
+      height: 852px;
+      background: #fff;
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.08);
+    }
+
+    .phone-inner {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px 0;
+      height: 54px;
+      position: relative;
+      z-index: 100;
+    }
+
+    .status-bar .time {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .status-bar .icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-bar .icons svg {
+      height: 12px;
+    }
+
+    /* Screens container */
+    .screens-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .screen::-webkit-scrollbar {
+      display: none;
+    }
+
+    .screen.hidden-right {
+      transform: translateX(100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .screen.hidden-left {
+      transform: translateX(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .screen.active {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ========== SCREEN 1: MY HEALTH HOME ========== */
+
+    #screen1 .screen-content {
+      padding-bottom: 100px;
+    }
+
+    .home-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 24px 16px;
+    }
+
+    .home-header .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .home-header .logo svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .home-header .profile-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .home-header .profile-area .name {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .home-header .profile-area .avatar {
+      width: 32px;
+      height: 32px;
+      background: #1a1a1a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .home-header .profile-area .avatar svg {
+      width: 18px;
+      height: 18px;
+      fill: #fff;
+    }
+
+    /* Urgent Care Banner */
+    .urgent-care-banner {
+      margin: 0 24px 24px;
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .urgent-care-banner:active {
+      transform: scale(0.98);
+    }
+
+    .urgent-care-banner .uc-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .urgent-care-banner .uc-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+
+    .urgent-care-banner .uc-text {
+      color: #fff;
+    }
+
+    .urgent-care-banner .uc-text .uc-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .urgent-care-banner .uc-text .uc-subtitle {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 2px;
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0 24px;
+      margin-bottom: 12px;
+    }
+
+    .section-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .section-header .action {
+      font-size: 14px;
+      color: #888;
+      cursor: pointer;
+    }
+
+    /* Appointment Card */
+    .appointment-card {
+      margin: 0 24px 28px;
+      background: #f5f5f5;
+      border-radius: 16px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .appointment-card:active {
+      background: #ebebeb;
+    }
+
+    .appointment-date {
+      width: 52px;
+      height: 56px;
+      background: #fff;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #e0e0e0;
+      flex-shrink: 0;
+    }
+
+    .appointment-date .month {
+      font-size: 10px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .appointment-date .day {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1;
+    }
+
+    .appointment-info .doctor-name {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .appointment-info .visit-type {
+      font-size: 13px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    /* Medications */
+    .medication-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 24px;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .medication-item:active {
+      background: #f5f5f5;
+    }
+
+    .med-checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #d0d0d0;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .med-checkbox.checked {
+      background: #1a1a1a;
+      border-color: #1a1a1a;
+    }
+
+    .med-checkbox.checked svg {
+      opacity: 1;
+    }
+
+    .med-checkbox svg {
+      width: 14px;
+      height: 14px;
+      fill: #fff;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .med-info {
+      flex: 1;
+    }
+
+    .med-info .med-name {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .med-info .med-detail {
+      font-size: 13px;
+      color: #888;
+      margin-top: 1px;
+    }
+
+    .med-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .renew-btn {
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .renew-btn:active {
+      background: #333;
+    }
+
+    .chevron-right {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ccc;
+    }
+
+    .chevron-right svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .med-divider {
+      height: 1px;
+      background: #f0f0f0;
+      margin: 0 24px 0 60px;
+    }
+
+    /* Goals Section */
+    .goals-section {
+      padding: 20px 24px 0;
+    }
+
+    .goals-section .section-header {
+      padding: 0;
+    }
+
+    .goals-section .section-header .action {
+      font-size: 14px;
+      color: #1a1a1a;
+      font-weight: 500;
+    }
+
+    /* Bottom Tab Bar */
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 88px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      padding-top: 10px;
+      z-index: 200;
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      min-width: 64px;
+      padding: 4px 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tab-item svg {
+      width: 24px;
+      height: 24px;
+      color: #999;
+      transition: color 0.2s ease;
+    }
+
+    .tab-item span {
+      font-size: 10px;
+      color: #999;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .tab-item.active svg {
+      color: #1a1a1a;
+    }
+
+    .tab-item.active span {
+      color: #1a1a1a;
+    }
+
+    /* ========== SCREEN 2: AI CHAT ========== */
+
+    #screen2 {
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 24px 16px;
+    }
+
+    .chat-header .hamburger {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.15s ease;
+    }
+
+    .chat-header .hamburger:active {
+      background: #f0f0f0;
+    }
+
+    .chat-header .hamburger svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .chat-header .close-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.15s ease;
+    }
+
+    .chat-header .close-btn:active {
+      background: #f0f0f0;
+    }
+
+    .chat-header .close-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .chat-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+
+    .chat-bot-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 24px;
+    }
+
+    .chat-bot-icon svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .chat-greeting {
+      margin-bottom: 8px;
+    }
+
+    .chat-greeting .greeting-name {
+      font-size: 22px;
+      font-weight: 400;
+      color: #888;
+    }
+
+    .chat-greeting .greeting-question {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.2;
+      margin-top: 4px;
+    }
+
+    .chat-suggestions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 32px;
+    }
+
+    .suggestion-chip {
+      display: inline-flex;
+      align-self: flex-start;
+      padding: 10px 18px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #2962ff;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: #fff;
+    }
+
+    .suggestion-chip:active {
+      background: #f0f4ff;
+      border-color: #2962ff;
+    }
+
+    .chat-input-area {
+      padding: 16px 24px 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #f5f5f5;
+      border-radius: 28px;
+      padding: 12px 16px;
+      gap: 12px;
+    }
+
+    .chat-input-wrapper .plus-icon {
+      width: 24px;
+      height: 24px;
+      color: #999;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .chat-input-wrapper input {
+      flex: 1;
+      border: none;
+      background: none;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      color: #1a1a1a;
+    }
+
+    .chat-input-wrapper input::placeholder {
+      color: #aaa;
+    }
+
+    .send-btn {
+      width: 44px;
+      height: 44px;
+      background: #2962ff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s ease;
+    }
+
+    .send-btn:active {
+      background: #1e4fd6;
+    }
+
+    .send-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+
+    /* ========== SCREEN 3: CHAT HISTORY ========== */
+
+    #screen3 {
+      background: #fff;
+    }
+
+    #screen3 .screen-content {
+      padding-bottom: 100px;
+    }
+
+    .history-search {
+      margin: 8px 24px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f5f5f5;
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+
+    .history-search svg {
+      width: 18px;
+      height: 18px;
+      color: #999;
+      flex-shrink: 0;
+    }
+
+    .history-search input {
+      flex: 1;
+      border: none;
+      background: none;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      color: #1a1a1a;
+    }
+
+    .history-search input::placeholder {
+      color: #aaa;
+    }
+
+    .history-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 24px;
+    }
+
+    .history-section-header h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .history-section-header .expand-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #999;
+    }
+
+    .history-divider {
+      height: 1px;
+      background: #f0f0f0;
+      margin: 0 24px;
+    }
+
+    .all-chats-header {
+      padding: 16px 24px 12px;
+    }
+
+    .all-chats-header h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .chat-list-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 24px;
+      gap: 14px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .chat-list-item:active {
+      background: #f5f5f5;
+    }
+
+    .chat-list-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #f0f0f0;
+    }
+
+    .chat-list-icon.blue {
+      background: none;
+    }
+
+    .chat-list-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .chat-list-icon img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .chat-list-text {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 400;
+      color: #1a1a1a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .new-message-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 88px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding-bottom: 20px;
+      z-index: 200;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .new-message-bar:active {
+      background: #f5f5f5;
+    }
+
+    .new-message-bar svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .new-message-bar span {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .new-msg-send-btn {
+      width: 32px;
+      height: 32px;
+      background: #1a1a1a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      right: 24px;
+    }
+
+    .new-msg-send-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: #fff;
+    }
+
+    /* Dynamic island */
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 36px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 300;
+    }
+
+    /* Overlay for transitions */
+    .screen-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0);
+      pointer-events: none;
+      z-index: 150;
+      transition: background 0.35s ease;
+    }
+
+    /* Sparkle icon for AI items */
+    .sparkle-icon {
+      color: #2962ff;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 430px) {
+      body {
+        background: #fff;
+        align-items: flex-start;
+      }
+      .phone-frame {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="phone-inner">
+      <div class="screens-container">
+
+        <!-- ==================== SCREEN 1: MY HEALTH HOME ==================== -->
+        <div class="screen active" id="screen1">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <span class="icons">
+              <svg viewBox="0 0 18 12" fill="none"><path d="M1 4.5C3.34 1.7 6.46 0 10 0c3.54 0 6.66 1.7 9 4.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M3.5 7C5.26 5.2 7.5 4 10 4s4.74 1.2 6.5 3" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="10" cy="10.5" r="1.5" fill="currentColor"/></svg>
+              <svg viewBox="0 0 16 12"><rect x="0" y="1" width="3" height="11" rx="0.5" fill="currentColor" opacity="0.3"/><rect x="4.5" y="4" width="3" height="8" rx="0.5" fill="currentColor" opacity="0.5"/><rect x="9" y="2" width="3" height="10" rx="0.5" fill="currentColor" opacity="0.7"/><rect x="13" y="0" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+              <svg viewBox="0 0 28 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2" stroke="currentColor" opacity="0.35"/><rect x="25" y="4" width="2" height="5" rx="1" fill="currentColor" opacity="0.4"/><rect x="2" y="2" width="20" height="9" rx="1" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="screen-content">
+            <div class="home-header">
+              <div class="logo">
+                <svg viewBox="0 0 28 28" fill="none">
+                  <rect x="0" y="4" width="4" height="20" rx="1" fill="#1a1a1a"/>
+                  <rect x="8" y="4" width="4" height="20" rx="1" fill="#1a1a1a"/>
+                  <rect x="0" y="12" width="12" height="4" rx="1" fill="#1a1a1a"/>
+                  <rect x="16" y="4" width="4" height="20" rx="1" fill="#1a1a1a"/>
+                  <rect x="24" y="4" width="4" height="20" rx="1" fill="#1a1a1a"/>
+                </svg>
+              </div>
+              <div class="profile-area">
+                <span class="name">Riley</span>
+                <div class="avatar">
+                  <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="urgent-care-banner" onclick="navigateTo('screen2')">
+              <div class="uc-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+              </div>
+              <div class="uc-text">
+                <div class="uc-title">Urgent care</div>
+                <div class="uc-subtitle">Now · 15 min wait</div>
+              </div>
+            </div>
+
+            <div class="section-header">
+              <h2>Appointments</h2>
+            </div>
+
+            <div class="appointment-card">
+              <div class="appointment-date">
+                <span class="month">MAR</span>
+                <span class="day">18</span>
+              </div>
+              <div class="appointment-info">
+                <div class="doctor-name">Dr. Cody Geddes</div>
+                <div class="visit-type">Video visit · 10:30 AM</div>
+              </div>
+            </div>
+
+            <div class="section-header">
+              <h2>Medications</h2>
+              <span class="action">Manage</span>
+            </div>
+
+            <div class="medication-item" id="med1">
+              <div class="med-checkbox" onclick="toggleMed(event, this)">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              </div>
+              <div class="med-info">
+                <div class="med-name">Lisinopril 10mg</div>
+                <div class="med-detail">8:00 AM · Expiring soon</div>
+              </div>
+              <div class="med-actions">
+                <button class="renew-btn">Renew</button>
+                <div class="chevron-right">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="med-divider"></div>
+
+            <div class="medication-item" id="med2">
+              <div class="med-checkbox" onclick="toggleMed(event, this)">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              </div>
+              <div class="med-info">
+                <div class="med-name">Vitamin D</div>
+                <div class="med-detail">Once daily</div>
+              </div>
+              <div class="med-actions">
+                <div class="chevron-right">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="goals-section">
+              <div class="section-header">
+                <h2>Goals & Tracking</h2>
+                <span class="action">+ Add goal</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab-item active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <span>My Health</span>
+            </div>
+            <div class="tab-item" onclick="navigateTo('screen2')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="8" x2="12" y2="15"/></svg>
+              <span>Get Care</span>
+            </div>
+            <div class="tab-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/></svg>
+              <span>My Plan</span>
+            </div>
+            <div class="tab-item" onclick="navigateTo('screen3')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              <span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== SCREEN 2: AI CHAT ==================== -->
+        <div class="screen hidden-right" id="screen2">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <span class="icons">
+              <svg viewBox="0 0 18 12" fill="none"><path d="M1 4.5C3.34 1.7 6.46 0 10 0c3.54 0 6.66 1.7 9 4.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M3.5 7C5.26 5.2 7.5 4 10 4s4.74 1.2 6.5 3" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="10" cy="10.5" r="1.5" fill="currentColor"/></svg>
+              <svg viewBox="0 0 16 12"><rect x="0" y="1" width="3" height="11" rx="0.5" fill="currentColor" opacity="0.3"/><rect x="4.5" y="4" width="3" height="8" rx="0.5" fill="currentColor" opacity="0.5"/><rect x="9" y="2" width="3" height="10" rx="0.5" fill="currentColor" opacity="0.7"/><rect x="13" y="0" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+              <svg viewBox="0 0 28 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2" stroke="currentColor" opacity="0.35"/><rect x="25" y="4" width="2" height="5" rx="1" fill="currentColor" opacity="0.4"/><rect x="2" y="2" width="20" height="9" rx="1" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="chat-header">
+            <div class="hamburger" onclick="navigateTo('screen3')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </div>
+            <div class="close-btn" onclick="navigateTo('screen1')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+          </div>
+
+          <div class="chat-body">
+            <div class="chat-bot-icon">
+              <svg viewBox="0 0 48 48" fill="none">
+                <circle cx="12" cy="12" r="6" fill="#2962ff"/>
+                <circle cx="36" cy="12" r="6" fill="#2962ff"/>
+                <circle cx="12" cy="36" r="6" fill="#2962ff"/>
+                <circle cx="36" cy="36" r="6" fill="#1a1a1a"/>
+              </svg>
+            </div>
+
+            <div class="chat-greeting">
+              <div class="greeting-name">Hi Riley</div>
+              <div class="greeting-question">How can I help you today?</div>
+            </div>
+
+            <div class="chat-suggestions">
+              <div class="suggestion-chip" onclick="handleSuggestion(this)">Renew Lisinopril</div>
+              <div class="suggestion-chip" onclick="handleSuggestion(this)">Ask about upcoming scan</div>
+              <div class="suggestion-chip" onclick="handleSuggestion(this)">Urgent Care</div>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <div class="chat-input-wrapper">
+              <div class="plus-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <input type="text" placeholder="Describe your issue..." id="chatInput">
+            </div>
+            <button class="send-btn" onclick="handleSend()">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================== SCREEN 3: CHAT HISTORY ==================== -->
+        <div class="screen hidden-right" id="screen3">
+          <div class="status-bar">
+            <span class="time">9:41</span>
+            <span class="icons">
+              <svg viewBox="0 0 18 12" fill="none"><path d="M1 4.5C3.34 1.7 6.46 0 10 0c3.54 0 6.66 1.7 9 4.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M3.5 7C5.26 5.2 7.5 4 10 4s4.74 1.2 6.5 3" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="10" cy="10.5" r="1.5" fill="currentColor"/></svg>
+              <svg viewBox="0 0 16 12"><rect x="0" y="1" width="3" height="11" rx="0.5" fill="currentColor" opacity="0.3"/><rect x="4.5" y="4" width="3" height="8" rx="0.5" fill="currentColor" opacity="0.5"/><rect x="9" y="2" width="3" height="10" rx="0.5" fill="currentColor" opacity="0.7"/><rect x="13" y="0" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+              <svg viewBox="0 0 28 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2" stroke="currentColor" opacity="0.35"/><rect x="25" y="4" width="2" height="5" rx="1" fill="currentColor" opacity="0.4"/><rect x="2" y="2" width="20" height="9" rx="1" fill="currentColor"/></svg>
+            </span>
+          </div>
+
+          <div class="screen-content">
+            <div class="history-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search">
+            </div>
+
+            <div class="history-section-header" onclick="toggleSection(this)">
+              <h3>In progress</h3>
+              <div class="expand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+
+            <div class="history-divider"></div>
+
+            <div class="history-section-header" onclick="toggleSection(this)">
+              <h3>Closed</h3>
+              <div class="expand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+
+            <div class="history-divider"></div>
+
+            <div class="all-chats-header">
+              <h3>All Chats</h3>
+            </div>
+
+            <div class="chat-list-item" onclick="navigateTo('screen2')">
+              <div class="chat-list-icon">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#999"/><path d="M4 20c0-3.31 3.58-6 8-6s8 2.69 8 6" fill="#999"/></svg>
+              </div>
+              <span class="chat-list-text">Dr. Smith Follow Up</span>
+            </div>
+
+            <div class="chat-list-item" onclick="navigateTo('screen2')">
+              <div class="chat-list-icon blue">
+                <svg viewBox="0 0 24 24" fill="none" width="36" height="36">
+                  <circle cx="7" cy="7" r="3.5" fill="#2962ff"/>
+                  <circle cx="17" cy="7" r="3.5" fill="#2962ff"/>
+                  <circle cx="7" cy="17" r="3.5" fill="#2962ff"/>
+                  <circle cx="17" cy="17" r="3.5" fill="#1a1a1a"/>
+                </svg>
+              </div>
+              <span class="chat-list-text">Hamstring stretch recommendat...</span>
+            </div>
+
+            <div class="chat-list-item" onclick="navigateTo('screen2')">
+              <div class="chat-list-icon blue">
+                <svg viewBox="0 0 24 24" fill="none" width="36" height="36">
+                  <circle cx="7" cy="7" r="3.5" fill="#2962ff"/>
+                  <circle cx="17" cy="7" r="3.5" fill="#2962ff"/>
+                  <circle cx="7" cy="17" r="3.5" fill="#2962ff"/>
+                  <circle cx="17" cy="17" r="3.5" fill="#1a1a1a"/>
+                </svg>
+              </div>
+              <span class="chat-list-text">Ordering physical insurance card</span>
+            </div>
+
+            <div class="chat-list-item" onclick="navigateTo('screen2')">
+              <div class="chat-list-icon blue">
+                <svg viewBox="0 0 24 24" fill="none" width="36" height="36">
+                  <circle cx="7" cy="7" r="3.5" fill="#2962ff"/>
+                  <circle cx="17" cy="7" r="3.5" fill="#2962ff"/>
+                  <circle cx="7" cy="17" r="3.5" fill="#2962ff"/>
+                  <circle cx="17" cy="17" r="3.5" fill="#1a1a1a"/>
+                </svg>
+              </div>
+              <span class="chat-list-text">Dr. Park network verification</span>
+            </div>
+
+            <div class="chat-list-item" onclick="navigateTo('screen2')">
+              <div class="chat-list-icon">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M7 14s1.5 2 5 2 5-2 5-2" stroke="#999" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="9" r="1.5" fill="#999"/><circle cx="15" cy="9" r="1.5" fill="#999"/><circle cx="12" cy="12" r="10" stroke="#999" stroke-width="1.5" fill="none"/></svg>
+              </div>
+              <span class="chat-list-text">Blood test results</span>
+            </div>
+          </div>
+
+          <div class="new-message-bar" onclick="navigateTo('screen2')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            <span>New message</span>
+            <div class="new-msg-send-btn">
+              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentScreen = 'screen1';
+
+    function navigateTo(targetId) {
+      if (targetId === currentScreen) return;
+
+      const current = document.getElementById(currentScreen);
+      const target = document.getElementById(targetId);
+
+      const screenOrder = ['screen1', 'screen2', 'screen3'];
+      const currentIdx = screenOrder.indexOf(currentScreen);
+      const targetIdx = screenOrder.indexOf(targetId);
+      const goingForward = targetIdx > currentIdx;
+
+      current.classList.remove('active');
+      current.classList.add(goingForward ? 'hidden-left' : 'hidden-right');
+
+      target.classList.remove('hidden-left', 'hidden-right');
+      target.classList.add('active');
+
+      target.scrollTop = 0;
+      currentScreen = targetId;
+      updateTabBar();
+    }
+
+    function updateTabBar() {
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      if (currentScreen === 'screen1') {
+        document.querySelectorAll('.tab-item')[0].classList.add('active');
+      }
+    }
+
+    function toggleMed(e, checkbox) {
+      e.stopPropagation();
+      checkbox.classList.toggle('checked');
+    }
+
+    function handleSuggestion(chip) {
+      chip.style.background = '#e8efff';
+      chip.style.borderColor = '#2962ff';
+      setTimeout(() => {
+        chip.style.background = '';
+        chip.style.borderColor = '';
+      }, 300);
+    }
+
+    function handleSend() {
+      const input = document.getElementById('chatInput');
+      if (input.value.trim()) {
+        input.value = '';
+      }
+    }
+
+    function toggleSection(header) {
+      const icon = header.querySelector('.expand-icon');
+      const isExpanded = icon.style.transform === 'rotate(90deg)';
+      icon.style.transform = isExpanded ? '' : 'rotate(90deg)';
+      icon.style.transition = 'transform 0.2s ease';
+    }
+
+    document.getElementById('chatInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') handleSend();
+    });
+  </script>
+</body>
+</html>
